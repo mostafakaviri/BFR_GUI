@@ -1,4 +1,5 @@
 import os
+import csv
 
 in_1 = 0
 in_0 = 0
@@ -7,7 +8,8 @@ data_low_out = []
 data_high_out = []
 out_1 = 0
 
-
+file = open('')
+#data = 
 
 for i in range(len(data_input)):
     out = 0.0004902 * data_input[i] + 0.0004902 * in_1 + 0.9608 * out_1

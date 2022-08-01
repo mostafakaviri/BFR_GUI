@@ -1,5 +1,6 @@
 from faulthandler import disable
 from tkinter.tix import Tree
+import traceback
 from xml.etree.ElementTree import Element
 from pandas import Series
 import PySimpleGUI as sg
@@ -64,101 +65,107 @@ class serial_thread (threading.Thread):
                 #line = line[:5]
                 data.append(line)
                 #data_int.append(int(line[:-2]))
-
+                print(line[:5])
+                data_int.append(float(line[:5]))
                 self.class_window["-CURRENT_PRESSURE_VALUE-"].update(f'Pressure Value:  {line[:5]}')
+                
 
 
             except:
                 #data.append(data[len(data)-1])
+                #print(traceback)
                 pass
              
             
             
-# def lop_calculator(data):
+def lop_calculator(data):
 
-#     data_max = max(data)
-#     data_max_index = data.index(data_max)
-#     cutted_data = data[data_max_index : ]
-#     mydata = [x for x in cutted_data if int(x) > 60]
-#     plt.plot([x for x in range(len(mydata))], mydata)
+    data_max = max(data)
+    data_max_index = data.index(data_max)
+    cutted_data = data[data_max_index : ]
+    mydata = [x for x in cutted_data if int(x) > 60]
+    #plt.plot([x for x in range(len(mydata))], mydata)
+
+    puls_data = lop_pre_calculator(mydata)
+    max_data = max_finder(puls_data)
+
+    min_data = min_finder(puls_data,max_data)
+    length_data = length_finder(max_data,min_data)
+    return
+    
 
 
-#     puls_data = lop_pre_calculator(mydata)
-#     max_data = max_finder(puls_data)
-#     min_data = min_finder(puls_data,max_data)
-#     length_data = length_finder(max_data,min_data)
-#     maximum_puls = max(max_data[0])
 
 
 
-# def move_mean(data, integer=75):
-#     n = len(data)
-#     output = []
-#     for i in range(n - 2*integer):
-#         sum = 0
+def move_mean(data, integer=75):
+    n = len(data)
+    output = []
+    for i in range(n - 2*integer):
+        sum = 0
 
-#         for j in range(integer*2):
-#             sum += data[i+j]
-#         output.append(sum/(2*integer))
+        for j in range(integer*2):
+            sum += data[i+j]
+        output.append(sum/(2*integer))
 
-#     return output
+    return output
 
-# def lop_pre_calculator(data, integer=75):
-#     trend_1 = move_mean(data, integer)
-#     trand_2 = move_mean(trend_1, integer)
-#     mydata = data[2*integer: len(data)-2*integer]
-#     ali = []
+def lop_pre_calculator(data, integer=75):
+    trend_1 = move_mean(data, integer)
+    trand_2 = move_mean(trend_1, integer)
+    mydata = data[2*integer: len(data)-2*integer]
+    ali = []
 
-#     for i in range(len(mydata)):
-#         ali.append(mydata[i] - trand_2[i])
-#     return ali
+    for i in range(len(mydata)):
+        ali.append(mydata[i] - trand_2[i])
+    return ali
 
-# def max_finder(data):
-#     dist = 100
-#     n = len(data)
-#     counter = 0
-#     output = [[],[]]
-#     i = 0
-#     while True:
+def max_finder(data):
+    dist = 100
+    n = len(data)
+    counter = 0
+    output = [[],[]]
+    
+    while True:
 
-#         if counter + dist > n :
-#             break
+        if counter + dist > n :
+            break
         
-#         assistive_array = [data[counter:counter + dist]]
-#         temp_max = max(assistive_array)
-#         temp_max_index = assistive_array.index(temp_max)
+        assistive_array = [data[counter:counter + dist]]
+        temp_max = max(assistive_array)
+        temp_max_index = assistive_array.index(temp_max)
 
-#         counter += temp_max_index
-#         if counter + dist > n :
-#             break
-#         assistive_array = [data[counter:counter + dist]]
-#         temp_max2 = max(assistive_array)
-#         temp_max_index2 = assistive_array.index(temp_max)
-#         if temp_max2 > temp_max:
-#             counter += temp_max_index2-1
-#             continue
-#         counter += temp_max_index2
-#         output[0][i] = temp_max
-#         output[1][i] = counter
-#         i += 1
-#     return output
+        counter += temp_max_index
+        if counter + dist > n :
+            break
+        assistive_array = [data[counter:counter + dist]]
+        temp_max2 = max(assistive_array)
+        temp_max_index2 = assistive_array.index(temp_max)
+        if temp_max2 > temp_max:
+            counter += temp_max_index2-1
+            continue
+        counter += temp_max_index2
+        output[0].append(temp_max) 
+        output[1].append(counter) 
+        
+    return output
 
-# def min_finder(data, max_data):
-#     output = [[],[]]
+def min_finder(data, max_data):
+    output = [[],[]]
 
-#     for i in range(len(max_data[1]) - 1):
-#         min_mammad = min(data[max_data[1][i] : max_data[1][i + 1]])
-#         index_min_mammad = data[max_data[1][i] : max_data[1][i + 1]].index(min_mammad)
-#         output[0][i] = min_mammad
-#         output[1][i] = index_min_mammad
-#     return output
+    for i in range(len(max_data[1]) - 1):
+        min_mammad = min(data[max_data[1][i] : max_data[1][i + 1]])
+        index_min_mammad = data[max_data[1][i] : max_data[1][i + 1]].index(min_mammad)
+        output[0].append(min_mammad)
+        output[1].append(index_min_mammad)
+    return output
 
-# def length_finder(max_data,min_data):
-#     output = [[],[]]
-#     for i in range(len(max_data[1]) - 1):
-#         output[0][i] = max_data[0][i] - min_data[0][i]
-#         output[1][i] = (max_data[1][i] + min_data[1][i])/2
-#     return output
+def length_finder(max_data,min_data):
+    output = [[],[]]
+    for i in range(len(max_data[1]) - 1):
+        output[0].append(max_data[0][i] - min_data[0][i])
+        output[1].append((max_data[1][i] + min_data[1][i])/2)
+    return output
 
 
 
@@ -184,8 +191,8 @@ ports = serial.tools.list_ports.comports()
 for port , desc , hwid in sorted(ports):
     my_ports.append(port)
 
-
 #For show saved files
+
 saved_test_list_column = [
     [
         sg.Listbox(
@@ -293,7 +300,7 @@ while True:
         ser.reset_input_buffer()
         ser.reset_output_buffer()
         ser.close()
-        #lop_calculator(data_int)
+        lop_calculator(data_int)
         window["-SERIAL_SITUATION-"].update("Serial data transfer has not began", text_color = 'red')
         window["-SCAN-"].update(disabled = False)
         window.Refresh()
