@@ -11,6 +11,7 @@ import threading
 import serial.tools.list_ports
 import math
 import matplotlib.pyplot as plt
+import pandas as pd
 
 # Colors
 back_ground_color = '#025d63' 
@@ -83,14 +84,54 @@ def lop_calculator(data):
     data_max = max(data)
     data_max_index = data.index(data_max)
     cutted_data = data[data_max_index : ]
+    writing_path = '.\\test_data\\mammad'
+    writing_path += f'\\{"cutted_data"}.csv'
+    os.makedirs(os.path.dirname(writing_path), exist_ok=True)
+    with open(writing_path, 'w') as f:
+        for i in range(len(cutted_data)):
+            f.write(''.join(str(i)+","+str(cutted_data[i])+'\n'))
+
+
     mydata = [x for x in cutted_data if int(x) > 60]
     #plt.plot([x for x in range(len(mydata))], mydata)
 
     puls_data = lop_pre_calculator(mydata)
+
+    writing_path = '.\\test_data\\mammad'
+    writing_path += f'\\{"puls_data"}.csv'
+    os.makedirs(os.path.dirname(writing_path), exist_ok=True)
+    with open(writing_path, 'w') as f:
+        for i in range(len(puls_data)):
+            f.write(''.join(str(i)+","+str(puls_data[i])+'\n'))
+
     max_data = max_finder(puls_data)
 
+    writing_path = '.\\test_data\\mammad'
+    writing_path += f'\\{"max_data"}.csv'
+    os.makedirs(os.path.dirname(writing_path), exist_ok=True)
+    with open(writing_path, 'w') as f:
+        for i in range(len(max_data[1])):
+            f.write(''.join(str(max_data[1][i])+","+str(max_data[0][i])+'\n'))
+
+
     min_data = min_finder(puls_data,max_data)
+
+    writing_path = '.\\test_data\\mammad'
+    writing_path += f'\\{"min_data"}.csv'
+    os.makedirs(os.path.dirname(writing_path), exist_ok=True)
+    with open(writing_path, 'w') as f:
+        for i in range(len(min_data[1][:])):
+            f.write(''.join(str(min_data[1][i])+","+str(min_data[0][i])+'\n'))
+
+
     length_data = length_finder(max_data,min_data)
+
+    writing_path = '.\\test_data\\mammad'
+    writing_path += f'\\{"length_data"}.csv'
+    os.makedirs(os.path.dirname(writing_path), exist_ok=True)
+    with open(writing_path, 'w') as f:
+        for i in range(len(length_data[1])):
+            f.write(''.join(str(length_data[1][i])+","+str(length_data[0][i])+'\n'))
     return
     
 
