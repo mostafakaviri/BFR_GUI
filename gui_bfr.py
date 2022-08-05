@@ -288,6 +288,9 @@ test_column = [
     [
         sg.Button("Estimate LOP", button_color = save_button_color, key = "-ESTIMATE-", disabled = True),
     ],
+    [
+        sg.Text("LOP:  0", font="Helvetica " + str(24), key = "-LOP-", text_color = texts_color, background_color = back_ground_color)
+    ]
    
 ]
 
@@ -396,7 +399,8 @@ while True:
 
         if event == "-ESTIMATE-":
             pass
-            #lop_calculator
+            #LOP = lop_calculator
+            #window["-LOP-"].update(f'LOP:  {LOP}')
     
 
 window.close()
