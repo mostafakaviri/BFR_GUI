@@ -12,6 +12,30 @@ import serial.tools.list_ports
 import math
 import matplotlib.pyplot as plt
 import pandas as pd
+from multiprocessing import Process
+from time import sleep
+
+def f(time):
+    sleep(time)
+
+
+# def run_with_limited_time(func, args, kwargs, time):
+#     """Runs a function with time limit
+
+#     :param func: The function to run
+#     :param args: The functions args, given as tuple
+#     :param kwargs: The functions keywords, given as dict
+#     :param time: The time limit in seconds
+#     :return: True if the function ended successfully. False if it was terminated.
+#     """
+#     p = Process(target=func, args=args, kwargs=kwargs)
+#     p.start()
+#     p.join(time)
+#     if p.is_alive():
+#         p.terminate()
+#         return False
+
+#     return True
 
 # Colors
 back_ground_color = '#025d63' 
@@ -27,15 +51,7 @@ serial_sit = '#f1c906'
 serial_sit_g = '#7dda36'
 save_button_color = '#063136'
 conection_sit = '#7dda36'
-# matplotlib.use("TkAgg")
 
-# def draw_figure(canvas, figure):
-#     figure_canvas_agg = FigureCanvasTkAgg(figure, canvas)
-#     figure_canvas_agg.draw()
-#     figure_canvas_agg.get_tk_widget().pack(side="top", fill="both", expand=1)
-#     return figure_canvas_agg
-
-# Class to get datas
 
 class serial_thread (threading.Thread):
 
@@ -258,7 +274,6 @@ test_column = [
         
         sg.Button('CONNECT', key='cnct', button_color = connect_button_color),
         sg.Button("START",button_color = startButtonColor, disabled = True, disabled_button_color = startDisabledButtonColor, key = '-START_BUTTON-', use_ttk_buttons = True),
-        
         sg.Button("STOP",button_color = stopButtonColor, disabled = True, disabled_button_color = stopDisabledButtonColor, key = '-STOP_BUTTON-', use_ttk_buttons = True),
     ], 
     [
@@ -269,7 +284,10 @@ test_column = [
     ],
     [
         sg.Text("Serial data transfer has not began", key = "-SERIAL_SITUATION-", text_color = serial_sit, background_color = back_ground_color)
-    ], 
+    ],
+    [
+        sg.Button("Estimate LOP", button_color = save_button_color, key = "-ESTIMATE-", disabled = True),
+    ],
    
 ]
 
@@ -318,13 +336,19 @@ while True:
     if event == "-START_BUTTON-" and start_flag == False :
         
         start_flag = True
-        ser = serial_connection(com_port)
-        
-        ser.write('1'.encode())
+        print("mammad")
+        try:
+            ser = serial_connection(com_port)
+        except:
+            window["-CURRENT_PRESSURE_VALUE-"].update("There is no serial communication exist over this com port")
+            continue
+        print("ali")
+        #ser.write('1'.encode())
         my_thread = serial_thread(ser, window)
+        print("nasser")
         
         my_thread.start() 
-        
+        print("sadegh")
         window["-SERIAL_SITUATION-"].update("Seria data transer has began", text_color = serial_sit_g)
         window["-SCAN-"].update(disabled = True)
         window.Refresh()
@@ -343,6 +367,7 @@ while True:
         ser.close()
         lop_calculator(data_int)
         window["-SERIAL_SITUATION-"].update("Serial data transfer has not began", text_color = 'red')
+        window["-ESTIMATE-"].update(disabled = False)
         window["-SCAN-"].update(disabled = False)
         window.Refresh()
     
@@ -367,13 +392,12 @@ while True:
             window["-SITUATION-"].update("There is nothing to save", text_color = 'yellow')
             window.Refresh()
 
-    # if event == "-SCAN-":
-    #     my_ports = ['select']
-    #     ports = serial.tools.list_ports.comports()
-    #     for port , desc , hwid in sorted(ports):
-    #         my_ports.append(port)
-    #     window["com"].update(my_ports, default_value= my_ports[0])
-    #     window.Refresh()
+        # For calculate lop
+
+        if event == "-ESTIMATE-":
+            pass
+            #lop_calculator
+    
 
 window.close()
 # bfr
